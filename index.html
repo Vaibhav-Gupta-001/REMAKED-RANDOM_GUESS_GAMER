@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEMO GAME PROJECT - RANDOM GUESS</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Press Start 2P', cursive;
+            background: url('https://img.freepik.com/premium-photo/synthwave-80s-90s-neon-background-rainbow-orange-yellow-pink-retro-cyberpunk-illustration-backdrop_934871-1766.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        p1 {
+            color: red;
+            background-color: blue;
+        }
+        p {
+            text-align: center;
+            color: black;
+            border: 2px solid black;
+            border-radius: 50px;
+            padding: 15px;
+            background-color: yellow;
+        }
+        p3 {
+            text-align: center;
+            color: white;
+            padding-bottom: 20px;
+        }
+        p2 {
+            font-size: 15px;
+            padding: 5px;
+        }
+        #desc {
+            text-align: center;
+            padding: 15px;
+            background: black;
+            color: white;   
+        }
+        #timer {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: #fff;
+            border: 1px solid #007bff;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            z-index: 1000;
+        }
+        .winning-message {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 20px;
+            animation: fadeIn 3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        body.winner {
+            background-color: #d4edda; /* Light green background for winning */
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-30px);
+            }
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+        .bouncing-text {
+            animation: bounce 2s infinite; /* Infinite bounce effect */
+            display: inline-block; /* Required to apply animation correctly */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container text-center mt-2"> 
+        <div class="alert alert-info" role="alert">
+            <b><p class="bouncing-text" style="font-size: 40px; font-family:'Times New Roman', Times, serif">RANDOM GUESS GAME</p></b>
+        </div>
+        <div id="timer">30</div>
+        <div class="d-flex justify-content-center">
+            <div class="card" style="width: 20rem;">
+                <img src="https://th.bing.com/th/id/OIP.omV4YkKbFAz8F5htAT6AMQHaD2?rs=1&pid=ImgDetMain" class="card-img-top" alt="THE GUESSING GAME">
+                <div class="card-body">                       
+                    <b><p4 class="card-text" style="font-size: 15px;">IN THIS GAME CHOOSE A RANDOM NUMBER BETWEEN 1 TO 100 AND IF IT IS SAME AS THAT OF NUMBER SELECTED BY COMPUTER, YOU WIN !!</p4></b><br><br>
+                    <u><i><b><p2>REMEMBER YOU HAVE ONLY 30 SECONDS TO GUESS THE CORRECT ANSWER :</b></p2></i></u>
+                    <p1><h6>ENTER A NUMBER BETWEEN 1-100 :</h6></p1>
+                    <input type="number" id="user-input" class="form-control">
+                    <button class="btn btn-success mt-2" onclick="guess_num()">SUBMIT YOUR GUESS</button>
+                    <button id="play-again-btn" class="btn btn-primary mt-2" onclick="restartGame()">PLAY AGAIN</button> <!-- New button added -->
+                </div>
+                <div id="result"></div>
+                <div id="winning-message" class="winning-message"></div>
+            </div> 
+        </div>
+    </div>
+
+    <!-- Include the canvas-confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        let randomnumber;
+        let timerElement = document.getElementById('timer');
+        let timerValue;
+        let timerInterval;
+
+        function startTimer() {
+            timerValue = 30;
+            timerElement.textContent = timerValue;
+            timerInterval = setInterval(() => {
+                timerValue--;
+                timerElement.textContent = timerValue;
+
+                if (timerValue <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('result').textContent = 'TIME IS UP! PLEASE TRY AGAIN.';
+                    document.getElementById('result').className = 'alert alert-danger';
+                    document.querySelector('button').disabled = true; // Disable the submit button when time is up
+                }
+            }, 1000);
+        }
+
+        function guess_num() {
+            const guess = Number(document.getElementById('user-input').value);
+            const result = document.getElementById('result');
+            const winningMessage = document.getElementById('winning-message');
+            
+            if (guess === randomnumber) {
+                result.textContent = 'CONGRATULATIONS !! YOU GOT THE CORRECT NUMBER';
+                result.className = 'alert alert-success';
+                partyPopper();
+                document.body.classList.add('winner'); // Change background color to indicate winning
+                winningMessage.textContent = 'You Won! Enjoy Your Victory!';
+                clearInterval(timerInterval); // Stop the timer when the correct number is guessed
+                document.querySelector('button').disabled = true; // Disable the submit button after winning
+            } else if (guess < randomnumber) {
+                console.log("SMALL");
+                alert("TRY ENTERING A BIGGER NUMBER ONCE !!");
+            } else {
+                console.log("LARGE");
+                alert("TRY ENTERING A SMALLER NUMBER ONCE !!");
+            }
+        } 
+
+        function partyPopper() {
+            window.confetti({
+                particleCount: 200,
+                spread: 90,
+                origin: { y: 0.6 },
+                colors: ['#ff0', '#0f0', '#00f', '#f00', '#0ff'] // Optional: Customize colors
+            });
+        }
+
+        function restartGame() {
+            // Reset the game state
+            document.body.classList.remove('winner');
+            document.getElementById('result').textContent = '';
+            document.getElementById('result').className = '';
+            document.getElementById('winning-message').textContent = '';
+            document.querySelector('button').disabled = false; // Re-enable the submit button
+
+            // Generate a new random number and restart the timer
+            randomnumber = Math.floor(Math.random() * 101);
+            startTimer();
+        }
+
+        // Initialize the game when the page loads
+        restartGame();
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script> 
+    
+    <footer id="desc">
+        <p3>&copy; END OF WEBPAGE</p3>
+    </footer>
+</body>
+</html>
